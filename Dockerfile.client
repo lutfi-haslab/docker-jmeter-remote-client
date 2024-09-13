@@ -1,0 +1,12 @@
+# Dockerfile.client
+FROM jmeter-base
+
+# Expose RMI and server ports for the JMeter client
+EXPOSE 1099 50000
+
+# Correct ENTRYPOINT format
+# ENTRYPOINT ["jmeter-server", "-Dserver.rmi.ssl.disable=true"]
+ENTRYPOINT $JMETER_HOME/bin/jmeter-server \
+                        -Dserver.rmi.localport=50000 \
+                        -Dserver_port=1099 \
+                        -Dserver.rmi.ssl.disable=true

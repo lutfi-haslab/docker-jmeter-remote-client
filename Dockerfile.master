@@ -1,0 +1,5 @@
+# Dockerfile.master
+FROM jmeter-base
+
+# Expose the master communication port
+EXPOSE 60000

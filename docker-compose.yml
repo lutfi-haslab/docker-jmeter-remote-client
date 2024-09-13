@@ -1,0 +1,47 @@
+services:
+  jmeter-master:
+    build:
+      context: .
+      dockerfile: Dockerfile.master
+    container_name: jmeter-master
+    tty: true
+    networks:
+      - jmeter-network
+    environment:
+      - JVM_ARGS=-Xms512m -Xmx1024m
+    volumes:
+      - ./test-plan:/test-plan # Mount the directory with your JMeter test plans
+    ports:
+      - "60000:60000"
+
+  jmeter-server-1:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    container_name: jmeter-server-1
+    tty: true
+    networks:
+      - jmeter-network
+    environment:
+      - JVM_ARGS=-Xms512m -Xmx1024m
+    ports:
+      - "50000:50000"
+      - "1099:1099"
+
+  jmeter-server-2:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    container_name: jmeter-server-2
+    tty: true
+    networks:
+      - jmeter-network
+    environment:
+      - JVM_ARGS=-Xms512m -Xmx1024m
+    ports:
+      - "50001:50000"
+      - "1100:1099"
+
+networks:
+  jmeter-network:
+    driver: bridge

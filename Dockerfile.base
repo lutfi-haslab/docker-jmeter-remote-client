@@ -1,0 +1,45 @@
+# Use a base image with Java 11
+FROM openjdk:11-jre-slim
+
+# Metadata as described in the previous Dockerfile
+LABEL Description="This image is used to start the Apache JMeter Master Executable" \
+      Vendor="Collabnix" \
+      Version="1.0"
+
+# Install pre-requisite packages including wget and necessary libraries
+RUN apt-get clean && \
+    apt-get update && \
+    apt-get -qy install \
+        wget \
+        curl \
+        libfreetype6 \
+        libfontconfig1 \
+        telnet \
+        iputils-ping \
+        unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Apache JMeter
+RUN mkdir /jmeter \
+    && cd /jmeter/ \
+    && wget https://dlcdn.apache.org/jmeter/binaries/apache-jmeter-5.6.3.tgz \
+    && tar -xzf apache-jmeter-5.6.3.tgz \
+    && rm apache-jmeter-5.6.3.tgz
+
+# Set JMeter Home
+ENV JMETER_HOME /jmeter/apache-jmeter-5.6.3/
+
+# Add JMeter to the PATH
+ENV PATH $JMETER_HOME/bin:$PATH
+
+# Download CMD Runner
+RUN cd $JMETER_HOME/lib \
+    && curl -O https://repo1.maven.org/maven2/kg/apc/cmdrunner/2.2.1/cmdrunner-2.2.1.jar
+
+# Download JMeter Plugin Manager
+RUN cd $JMETER_HOME/lib/ext \
+    && curl -O https://repo1.maven.org/maven2/kg/apc/jmeter-plugins-manager/1.6/jmeter-plugins-manager-1.6.jar
+
+# Install Plugins
+# RUN cd $JMETER_HOME/lib \
+#     && java -jar cmdrunner-2.2.1.jar --tool org.jmeterplugins.repository.PluginManagerCMD install-all-except jpgc-hadoop,jpgc-oauth,ulp-jmeter-autocorrelator-plugin,ulp-jmeter-videostreaming-plugin,ulp-jmeter-gwt-plugin,tilln-iso8583
